@@ -84,7 +84,6 @@ class Parser():
             ret = []
             for subterm in subterms:
                 ret.extend(self.parse_literal(subterm))
-            print('RET', ret)
             return ret
 
         not_match = re.match(r'\s*\(\s*not\s*(.*)\s*\)\s*', term_expr)
@@ -198,7 +197,6 @@ class Parser():
 
         concat_match = re.match(r'\(\s*str\.\+\+(.*)\)', string)
         if concat_match:
-            print('GROUP:', concat_match.groups()[0])
             my_string = My_String(
                 'concat', concats_strs=self.parse_many_strings(concat_match.groups()[0]))
             # потом проверить
