@@ -198,7 +198,7 @@ class Parser():
         concat_match = re.match(r'\(\s*str\.\+\+(.*)\)', string)
         if concat_match:
             my_string = My_String(
-                'concat', concats_strs=self.parse_many_strings(concat_match.groups()[0]))
+                'str.++', concats_strs=self.parse_many_strings(concat_match.groups()[0]))
             # потом проверить
             print(my_string)
             if my_string in self.strings:
@@ -222,7 +222,6 @@ class Parser():
 
         replace_match = re.match(r'\(\s*str\.replace\s*(.*)\s*\)\s*', string)
         if replace_match:
-            print('REPLACE')
             my_string = My_String(
                 'str.replace', replace_strs=self.parse_many_strings(replace_match.groups()[0]))
             # потом проверить
@@ -234,6 +233,8 @@ class Parser():
 
 
 if __name__ == '__main__':
+    if len(argv) == 1:
+        argv.append('tests/parser/test_5.smt2')
     p = Parser(argv[1])
     p.parse()
     print(p)

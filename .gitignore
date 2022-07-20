@@ -1,4 +1,7 @@
-__pycache__
+*__pycache__
 
 tests/*/result*
 smth.py
+
+plan.md
+*generated*

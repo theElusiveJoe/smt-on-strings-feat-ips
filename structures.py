@@ -2,7 +2,14 @@ from copy import deepcopy
 
 
 class My_String():
+    """
+    stype - один из:
+    'const' , 'variable', 'str.++' , 'str.replace', 'str.replace_all'
+    """
+
     def __init__(self, stype, cont=None, var_name=None, concats_strs=None, replace_strs=None):
+        if stype not in ['const' , 'variable', 'str.++' , 'str.replace', 'str.replace_all']:
+            raise Exception(f'Указан неверный stype при создании My_String: {stype}')
         self.stype = stype
         self.cont = cont
         self.var_name = var_name
@@ -36,14 +43,20 @@ class My_String():
         if self.var_name:
             return self.var_name == o.var_name
 
-        if self.stype == 'concat':
+        if self.stype == 'str.++':
             return self.concats_strs == o.concats_strs
 
         return self.replace_strs == o.replace_strs
 
 
 class Atom():
+    """
+    ltype - один из:
+    '=', 'str.contains'
+    """
     def __init__(self, ltype, my_string1, my_string2):
+        if ltype not in ['=', 'str.contains']:
+            raise Exception(f'Указан неверный ltype при создании Atom: {ltype}')
         self.ltype = ltype
         self.my_string1 = my_string1
         self.my_string2 = my_string2
@@ -62,7 +75,7 @@ class Literal():
         self.decisive = decisive
 
     def __str__(self):
-        return f'({"*" if self.decisive else ""}{"not " if self.negation else ""}{str(self.atom)})'
+        return f'{"(not " if self.negation else ""}{str(self.atom)}{")" if self.negation else ""}'
 
     def __eq__(self, o):
         return self.negation == o.negation and self.atom == o.atom
@@ -81,10 +94,11 @@ class Clause():
         self.literals = literals
 
     def __str__(self):
-        s = ''
+        s = '(or\n'
         for lw in self.literals:
-            s += ' ' + str(lw)
-        return f'(or{s})'
+            s += f'    {str(lw)}\n'
+        s += '  )\n'
+        return s
 
     def __eq__(self, o):
         for x in self.literals:
@@ -97,27 +111,41 @@ class Clause():
 
 
 class Formula():
-    def __init__(self, p):
-        self.strings = p.strings
-        self.atoms = p.atoms
-        self.literals = p.literals
-        self.clauses = p.clauses
+    def __init__(self, **kwargs):
+        """
+        либо без аргументов,
+        либо {
+            strings: [],
+            atoms: [],
+            literals: [],
+            clauses: []
+        }
+        """
+        if not kwargs:
+            return
+        self.strings = kwargs['strings']
+        self.atoms = kwargs['atoms']
+        self.literals = kwargs['literals']
+        self.clauses = kwargs['clauses']
 
     def __str__(self):
-        s = '\n###FORMULA:###\n'
-        s += 'STRINGS:\n'
-        for x in self.strings:
-            s += '  ' + str(x)+'\n'
-        s += 'ATOMS:\n'
-        for x in self.atoms:
-            s += '  ' + str(x)+'\n'
-        s += 'LITERALS:\n'
-        for x in self.literals:
-            s += '  ' + str(x)+'\n'
-        s += 'CLAUSES:\n'
-        for x in self.clauses:
-            s += '  ' + str(x)+'\n'
-        return s
+        try:
+            s = '\n###FORMULA:###\n'
+            s += 'STRINGS:\n'
+            for x in self.strings:
+                s += '  ' + str(x)+'\n'
+            s += 'ATOMS:\n'
+            for x in self.atoms:
+                s += '  ' + str(x)+'\n'
+            s += 'LITERALS:\n'
+            for x in self.literals:
+                s += '  ' + str(x)+'\n'
+            s += 'CLAUSES:\n'
+            for x in self.clauses:
+                s += '  ' + str(x)+'\n'
+            return s
+        except:
+            return "ПУСТАЯ ФОРМУЛА"
 
     def copy(self):
         return deepcopy(self)
