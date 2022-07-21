@@ -1,9 +1,9 @@
 import sys
 sys.path.insert(0, sys.path[0] + '/..')
+from formula_generator.alphabet_strings import *
 from copy import deepcopy
 import random
 import configparser
-from alphabet_strings import *
 from structures import *
 
 
@@ -13,7 +13,7 @@ def randbool(prob=0.5):
 
 class Generator():
 
-    def __init__(self, config_file):
+    def __init__(self, config_file='formula_generator/generator_config.ini'):
         co = configparser.ConfigParser()
         co.read(config_file)
 

@@ -48,6 +48,9 @@ class My_String():
 
         return self.replace_strs == o.replace_strs
 
+    def __hash__(self):
+        return len(self.__str__())
+
 
 class Atom():
     """
@@ -67,6 +70,8 @@ class Atom():
     def __eq__(self, o):
         return self.ltype == o.ltype and self.my_string1 == o.my_string1 and self.my_string2 == o.my_string2
 
+    def __hash__(self):
+        return len(self.__str__())
 
 class Literal():
     def __init__(self, atom, negation, decisive=False):

@@ -5,3 +5,10 @@ smth.py
 
 plan.md
 *generated*
+bugs.py
+.gitignore
+fib_str.py
+
+formula_generator/generator_config.ini
+temp.smt2
+
