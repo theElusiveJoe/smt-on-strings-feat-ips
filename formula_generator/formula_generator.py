@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, sys.path[0] + '/..')
-from formula_generator.alphabet_strings import *
+from alphabet_strings import *
 from copy import deepcopy
 import random
 import configparser
@@ -218,7 +218,7 @@ class Generator():
 if __name__ == '__main__':
     co = configparser.ConfigParser()
     g = Generator('formula_generator/generator_config.ini')
-    # print(g.config)
+    print(g.config)
     g.generate()
-    # print(g)
+    print(g)
     g.to_smt2_file(include_config=True, filepath='tests/generated_0.smt2')
