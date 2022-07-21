@@ -118,11 +118,9 @@ class Lia_Formula():
                 for s in smt2_strings:
                     f.write(s+'\n')
         except:
-            raise Exception('Ошибка при создании временного файла')
-
-        cmd = f'z3 -smt2 {temp}'
-        result = run(['z3', '-smt2', temp])
-        print(result.returncode)
+            raise Exception('Ошибка при создании/открытии временного файла')
+        
+        return bool(run(['z3', '-smt2', temp]).returncode)
 
 
 if __name__ == '__main__':
