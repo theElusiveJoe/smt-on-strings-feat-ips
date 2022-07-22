@@ -75,6 +75,7 @@ class Parser():
                 clause = Clause(self.parse_literal(assert_match.groups()[0]))
                 if clause not in self.clauses:
                     self.clauses.append(clause)
+        return self
 
     def parse_literal(self, term_expr):
         print('parse literal:', term_expr)
@@ -231,6 +232,18 @@ class Parser():
             self.strings.append(my_string)
             return my_string
 
+    def to_formula(self):
+        """
+        Возвращает объект типа Formula,
+        инициализированный рекурсивными копиями полей self 
+        """
+        f = Formula(
+            strings=deepcopy(self.strings),
+            atoms=deepcopy(self.atoms),
+            literals=deepcopy(self.literals),
+            clauses=deepcopy(self.clauses)
+        )
+        return f
 
 if __name__ == '__main__':
     if len(argv) == 1:

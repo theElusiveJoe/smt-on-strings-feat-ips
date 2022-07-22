@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, sys.path[0] + '/..')
-from alphabet_strings import *
+from formula_generator.alphabet_strings import *
 from copy import deepcopy
 import random
 import configparser
@@ -73,6 +73,8 @@ class Generator():
         self.shaker_index = 0
         for _ in range(self.config['asserts_number']):
             self.gen_assert()
+
+        return self
 
     def gen_assert(self):
         literals = []
@@ -216,7 +218,6 @@ class Generator():
 
 
 if __name__ == '__main__':
-    co = configparser.ConfigParser()
     g = Generator('formula_generator/generator_config.ini')
     print(g.config)
     g.generate()
