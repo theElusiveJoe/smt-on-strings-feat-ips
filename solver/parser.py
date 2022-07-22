@@ -1,5 +1,5 @@
 import re
-from structures import *
+from .structures import *
 from sys import argv
 
 def split_to_pathernesses(whole_string):
@@ -43,7 +43,8 @@ class Parser():
         with open(self.filepath) as f:
             whole_string = re.sub('\s+', ' ', f.read())
             self.raw_strings = split_to_pathernesses(whole_string)
-
+        self.parse()
+        
     def __str__(self):
         s = ''
         s += f'STRINGS({len(self.strings)}):\n'
@@ -237,17 +238,9 @@ class Parser():
         Возвращает объект типа Formula,
         инициализированный рекурсивными копиями полей self 
         """
-        f = Formula(
+        return Formula(
             strings=deepcopy(self.strings),
             atoms=deepcopy(self.atoms),
             literals=deepcopy(self.literals),
             clauses=deepcopy(self.clauses)
         )
-        return f
-
-if __name__ == '__main__':
-    if len(argv) == 1:
-        argv.append('tests/parser/test_5.smt2')
-    p = Parser(argv[1])
-    p.parse()
-    print(p)

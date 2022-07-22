@@ -1,8 +1,10 @@
-from parser import Parser
+import context
+from solver.parser import Parser
+import sys
 import os 
 import re
 
-os.chdir('./tests/parser/')
+os.chdir('tests/parser_tests')
 files = os.listdir()
 for file in files:
     if re.match('test_.\.smt2', file):

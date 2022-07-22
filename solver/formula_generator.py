@@ -1,11 +1,9 @@
-import sys
-sys.path.insert(0, sys.path[0] + '/..')
-from formula_generator.alphabet_strings import *
+from .alphabet_strings import *
 from copy import deepcopy
 import random
 import configparser
-from structures import *
-
+from .structures import *
+from os.path import abspath
 
 def randbool(prob=0.5):
     return random.random() < prob
@@ -13,10 +11,10 @@ def randbool(prob=0.5):
 
 class Generator():
 
-    def __init__(self, config_file='formula_generator/generator_config.ini'):
+    def __init__(self, config_file='generator_config.ini'):
         co = configparser.ConfigParser()
-        co.read(config_file)
-
+        print(abspath(config_file))
+        co.read(abspath(config_file))
         parse_keys = {
             'constants': ['constant_min_len', 'constant_max_len'],
             'variables': ['variables_number_low_limit', 'variables_number_high_limit'],
@@ -28,9 +26,9 @@ class Generator():
         for group, group_params in parse_keys.items():
             for param in group_params:
                 self.config[param] = co.getint(group, param)
-
         self.alphabeth = globals()[co.get('constants', 'alphabeth')]
-
+        self.generate()
+        
     def __str__(self):
         s = '\n###FORMULA:###\n'
         s += 'STRINGS:\n'
@@ -215,11 +213,3 @@ class Generator():
                 dst.write(s)
         except:
             raise Exception(f'невозможно открытыть файл {filepath} для записи')
-
-
-if __name__ == '__main__':
-    g = Generator('formula_generator/generator_config.ini')
-    print(g.config)
-    g.generate()
-    print(g)
-    g.to_smt2_file(include_config=True, filepath='tests/generated_0.smt2')

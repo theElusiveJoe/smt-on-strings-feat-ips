@@ -1,8 +1,5 @@
-import sys
-sys.path.insert(0, sys.path[0] + '/..')
 from subprocess import run
-from structures import *
-from formula_generator.formula_generator import Generator
+from .structures import *
 
 
 class Lia_Formula():
@@ -121,16 +118,3 @@ class Lia_Formula():
             raise Exception('Ошибка при создании/открытии временного файла')
         
         return bool(run(['z3', '-smt2', temp]).returncode)
-
-
-if __name__ == '__main__':
-    g = Generator()
-    g.generate()
-    f = g.to_formula()
-
-    print(f)
-
-    l = Lia_Formula(f)
-    print(l)
-    l.check_sat()
-  
