@@ -4,6 +4,9 @@ from solver.lia import Lia_Formula
 from solver.parser import Parser
 from solver.structures import *
 
-g = Generator('generator_config.ini')
-print(g)
-check_sat(g.to_formula())
+p = Parser('tests/dpllt_tests/test_1.smt2')
+f = p.to_formula()
+f.print_dpll_view()
+print('\n')
+result = check_sat(f)
+print(result)

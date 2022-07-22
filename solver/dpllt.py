@@ -1,5 +1,6 @@
 from .structures import *
 
+
 def call_lia(f):
     return True
 
@@ -34,8 +35,10 @@ def unit_propagate(m, f):
     for c in f.clauses:
         for literal in c.literals:
             if literal_in_m(literal, m) == 'u' and check_if_zero_without(c, literal, m):
-                m.append(literal.get_conjugate(decisive=False))
-                print('M <-', literal.get_conjugate(decisive=False))
+                m.append(literal.get_conjugate())
+                # print('[m] <-', f.dpll_literal_view(literal.get_conjugate()), '<==>', f.dpll_literal_view(literal), ' = 1')
+                # print('[m] ', ' '.join([f.simple_atmoms[literal.atom]+':'+str(literal_in_m(literal, m)) for literal in f.literals]))
+                # print('\n')
                 return unit_propagate(m, f)
 
     return m, f
@@ -45,28 +48,36 @@ def check_broken(m, f):
     for c in f.clauses:
         if any([literal_in_m(literal, m) for literal in c.literals]):
             continue
-        print('BROKEN')
-        return False
-    return True
+        print(get_m_state(m, f), '->', f'"{f.dpll_clause_view(c)}"')
+        return True
+    return False
 
 
 def decide(m, f):
     for c in f.clauses:
         for literal in c.literals:
             if literal_in_m(literal, m) == 'u':
-                print('Decide: ', literal.get_copy(decisive=False), '= 0')
+                s = f.dpll_literal_view(literal)
+                # print('Decide: ', s,)
                 return literal
 
 
-def check_node(m, f):
+def check_node(m, f, old_m):
     """
     не забыть, что нельзя гонять один и тот же объект списка по рекурсивным вызовам
     """
+    
+    print(get_m_state(old_m, f), '->', get_m_state(m, f))
+
+    
+    before_prop = m.copy()
     # 1 распространяем переменные
     m, f = unit_propagate(m, f)
+    if m != before_prop:
+        print(get_m_state(before_prop, f), '->', get_m_state(m, f))
 
     # 2 проверяем, не сломало ли ничего распространение
-    if not check_broken(m, f):
+    if check_broken(m, f):
         return False
     """
     в данный момент lia вызывается на каждом ветвлении
@@ -80,10 +91,15 @@ def check_node(m, f):
         return call_theory(f, m)
 
     # 4 если осталось, то порождаем 2 ветки
-    new_literal = l
-    return check_node(m + [new_literal], f) or check_node(m+[new_literal.get_conjugate()], f)
+    new_literal = decide(m, f)
+    
+    return check_node(m + [new_literal], f, m) or check_node(m+[new_literal.get_conjugate()], f, m)
+
+
+def get_m_state(m, f):
+    return f'"{" ".join(list(filter(None, [f.dpll_literal_view(literal)+":"+str(literal_in_m(literal, m)) if not literal.negation else None for literal in f.literals])))}"'
 
 
 def check_sat(f):
-    return check_node([], f)
+    return check_node([], f, [])
    

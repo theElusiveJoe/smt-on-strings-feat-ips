@@ -8,8 +8,9 @@ class My_String():
     """
 
     def __init__(self, stype, cont=None, var_name=None, concats_strs=None, replace_strs=None):
-        if stype not in ['const' , 'variable', 'str.++' , 'str.replace', 'str.replace_all']:
-            raise Exception(f'Указан неверный stype при создании My_String: {stype}')
+        if stype not in ['const', 'variable', 'str.++', 'str.replace', 'str.replace_all']:
+            raise Exception(
+                f'Указан неверный stype при создании My_String: {stype}')
         self.stype = stype
         self.cont = cont
         self.var_name = var_name
@@ -57,9 +58,11 @@ class Atom():
     ltype - один из:
     '=', 'str.contains'
     """
+
     def __init__(self, ltype, my_string1, my_string2):
         if ltype not in ['=', 'str.contains']:
-            raise Exception(f'Указан неверный ltype при создании Atom: {ltype}')
+            raise Exception(
+                f'Указан неверный ltype при создании Atom: {ltype}')
         self.ltype = ltype
         self.my_string1 = my_string1
         self.my_string2 = my_string2
@@ -72,6 +75,7 @@ class Atom():
 
     def __hash__(self):
         return len(self.__str__())
+
 
 class Literal():
     def __init__(self, atom, negation, decisive=False):
@@ -133,6 +137,14 @@ class Formula():
         self.literals = kwargs['literals']
         self.clauses = kwargs['clauses']
 
+        self.simple_atmoms = {}
+        letter = ord('A')
+        for atom in self.atoms:
+            self.simple_atmoms[atom] = chr(letter)
+            letter += 1
+
+        self.literals.sort(key=lambda x: self.simple_atmoms[x.atom])
+
     def __str__(self):
         try:
             s = '\n###FORMULA:###\n'
@@ -163,3 +175,14 @@ class Formula():
             cop.clauses.append(ext_clause)
 
         return cop
+
+    def dpll_literal_view(self, literal):
+        return f'{"(not " if literal.negation else ""}{self.simple_atmoms[literal.atom]}{")" if literal.negation else ""}'
+
+    def dpll_clause_view(self, clause):
+        return f'(or {" ".join([self.dpll_literal_view(literal) for literal in clause.literals])})'
+
+    def print_dpll_view(self):
+        for clause in self.clauses:
+            # print(f'(or {" ".join([self.dpll_literal_view(literal) for literal in clause.literals])})')
+            print(self.dpll_clause_view(clause))

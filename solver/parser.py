@@ -72,14 +72,14 @@ class Parser():
 
             assert_match = re.match(r'\s*\(\s*assert\s*(.*)\s*\)\s*', string)
             if assert_match:
-                print('parse assert:', string)
+                # print('parse assert:', string)
                 clause = Clause(self.parse_literal(assert_match.groups()[0]))
                 if clause not in self.clauses:
                     self.clauses.append(clause)
         return self
 
     def parse_literal(self, term_expr):
-        print('parse literal:', term_expr)
+        # print('parse literal:', term_expr)
         or_match = re.match(r'\s*\(\s*or\s*(.*)\s*\)\s*', term_expr)
         if or_match:
             subterms = split_to_pathernesses(or_match.groups()[0])
@@ -107,7 +107,7 @@ class Parser():
         return [literal]
 
     def parse_atom(self, atom_expr):
-        print('parse atom', atom_expr)
+        # print('parse atom', atom_expr)
 
         eq_match = re.match(r'\s*\(\s*=\s*(.*)\s*\)\s*', atom_expr)
         if eq_match:
@@ -134,7 +134,7 @@ class Parser():
         return atom
 
     def parse_many_strings(self, string_of_strings):
-        print('parse many strings:', string_of_strings)
+        # print('parse many strings:', string_of_strings)
         string_of_strings = string_of_strings.strip()
 
         if string_of_strings == '':
@@ -194,7 +194,7 @@ class Parser():
         return ret
 
     def parse_string(self, string):
-        print('PARSING STRING:', string)
+        # print('PARSING STRING:', string)
         string = string.strip()
 
         concat_match = re.match(r'\(\s*str\.\+\+(.*)\)', string)
@@ -202,7 +202,7 @@ class Parser():
             my_string = My_String(
                 'str.++', concats_strs=self.parse_many_strings(concat_match.groups()[0]))
             # потом проверить
-            print(my_string)
+            # print(my_string)
             if my_string in self.strings:
                 i = self.strings.index(my_string)
                 return self.strings[i]

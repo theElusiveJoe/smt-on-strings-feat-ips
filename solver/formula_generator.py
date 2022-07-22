@@ -13,7 +13,6 @@ class Generator():
 
     def __init__(self, config_file='generator_config.ini'):
         co = configparser.ConfigParser()
-        print(abspath(config_file))
         co.read(abspath(config_file))
         parse_keys = {
             'constants': ['constant_min_len', 'constant_max_len'],
