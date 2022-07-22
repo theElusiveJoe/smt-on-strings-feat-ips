@@ -13,3 +13,4 @@ formula_generator/generator_config.ini
 temp.smt2
 
 tests/dpllt_tests/test_1.smt2
+*.svg
