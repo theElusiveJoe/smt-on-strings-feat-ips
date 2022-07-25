@@ -1,14 +1,15 @@
 from .structures import *
+from .lia import Lia_Formula
 
 
 def call_lia(f):
-    return True
+    return  Lia_Formula(f).check_sat()
 
 
 def call_theory(f, m):
     """
     По идее, теория вызывается просто на набор Литералов, 
-    мб для этого выделить отдельную структуру?
+    мб для этого определить отдельную структуру?
     """
     return True
 
