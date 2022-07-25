@@ -32,7 +32,7 @@ class My_String():
             s = self.stype
             for cs in self.replace_strs:
                 s += ' ' + str(cs)
-        return f'[{s}]'
+        return f'({s})'
 
     def __eq__(self, o):
         if self.stype != o.stype:
