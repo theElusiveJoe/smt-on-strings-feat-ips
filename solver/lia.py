@@ -109,14 +109,14 @@ class Lia_Formula():
         # for x, y in self.string_to_lia.items():
             # if x.stype == 'str.replace' or x.stype == 'str.replace_all':
             # smt2_strings.append(f'(assert (= {y} {x}))')
-        smt2_strings.append(';------------------')
+        # smt2_strings.append(';------------------')
 
         for clause in self.formula.clauses:
             clause_interpret = self.clause_interpretation_in_lia(clause)
             if clause_interpret:
                 smt2_strings.append(
                     f'(assert {clause_interpret})')
-        smt2_strings.append(';------------------')
+        # smt2_strings.append(';------------------')
         smt2_strings.append('(check-sat)')
         # smt2_strings.append('(get-model)')
 
