@@ -12,9 +12,6 @@ class My_String():
             raise Exception(
                 f'Указан неверный stype при создании My_String: {stype}')
         if 'str.rep' in stype and (len(replace_strs) != 3 or replace_strs[1].cont == ''):
-            print('RPLCE STR[1]:', replace_strs[1])
-            for x in replace_strs:
-                print(x)
             raise Exception(f'Ошибка при создании my_string: stype={stype}, replace_strs={[str(rs) for rs in replace_strs]}')
 
         if concats_strs:
@@ -153,7 +150,8 @@ class Formula():
         self.atoms = kwargs['atoms']
         self.literals = kwargs['literals']
         self.clauses = kwargs['clauses']
-        self.logic = kwargs['logic']
+        if 'logic' in kwargs:
+            self.logic = kwargs['logic']
 
         self.simple_atmoms = {}
         letter = ord('A')

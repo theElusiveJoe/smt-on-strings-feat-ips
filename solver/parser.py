@@ -258,5 +258,5 @@ class Parser():
             atoms=deepcopy(self.atoms),
             literals=deepcopy(self.literals),
             clauses=deepcopy(self.clauses),
-            logic = self.logic
+            logic = self.logic if hasattr(self, 'logic') else None
         )
