@@ -197,9 +197,9 @@ class Generator():
         """
         file_path is None => std.out 
         """
-        s = ''.join([f'CONFIG:  {key} : {self.config[key]}\n' for key in self.config]) + '\n' if include_config else ''
+        s = ''.join([f'; CONFIG:  {key} : {self.config[key]}\n' for key in self.config]) + '\n' if include_config else ''
         
-        s += '\n'.join([f'(define {str(x)} () String)' for x in self.variables])
+        s += '\n'.join([f'(declare-fun {str(x)} () String)' for x in self.variables])
         s+='\n\n'
         s += '\n'.join([f'(assert {str(x)})' for x in self.clauses])
         

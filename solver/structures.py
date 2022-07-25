@@ -1,5 +1,5 @@
 from copy import deepcopy
-
+import random
 
 class My_String():
     """
@@ -11,6 +11,23 @@ class My_String():
         if stype not in ['const', 'variable', 'str.++', 'str.replace', 'str.replace_all']:
             raise Exception(
                 f'Указан неверный stype при создании My_String: {stype}')
+        if 'str.rep' in stype and (len(replace_strs) != 3 or replace_strs[1].cont == ''):
+            print('RPLCE STR[1]:', replace_strs[1])
+            for x in replace_strs:
+                print(x)
+            raise Exception(f'Ошибка при создании my_string: stype={stype}, replace_strs={[str(rs) for rs in replace_strs]}')
+
+        if concats_strs:
+            concats_strs = list(
+                filter(lambda x: x is not None and x.cont != '', concats_strs))
+            if len(concats_strs) == 1:
+                    the_only_str= concats_strs[0]
+                    self.stype = the_only_str.stype
+                    self.cont = the_only_str.cont
+                    self.var_name = the_only_str.var_name
+                    self.concats_strs = the_only_str.concats_strs
+                    self.replace_strs = the_only_str.replace_strs
+                    return
         self.stype = stype
         self.cont = cont
         self.var_name = var_name
@@ -18,7 +35,7 @@ class My_String():
         self.replace_strs = replace_strs
 
     def __str__(self):
-        if self.cont:
+        if self.cont is not None:
             # s = f'"{self.cont}"'
             return f'"{self.cont}"'
         elif self.var_name:
@@ -38,7 +55,7 @@ class My_String():
         if self.stype != o.stype:
             return False
 
-        if self.cont:
+        if self.stype == 'const':
             return self.cont == o.cont
 
         if self.var_name:
