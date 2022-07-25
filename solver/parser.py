@@ -80,7 +80,11 @@ class Parser():
                 if clause not in self.clauses and clause and clause.literals and len(clause.literals) > 0:
                     self.clauses.append(clause)
                 continue
-            print(string)
+
+            set_logic_match = re.match(r'\s*\(\s*set-logic (.*)\s*\)\s*', string)
+            if set_logic_match:
+                self.logic = set_logic_match.groups()[0]
+
         return self
 
     def parse_literal(self, term_expr):
@@ -253,5 +257,6 @@ class Parser():
             strings=deepcopy(self.strings),
             atoms=deepcopy(self.atoms),
             literals=deepcopy(self.literals),
-            clauses=deepcopy(self.clauses)
+            clauses=deepcopy(self.clauses),
+            logic = self.logic
         )

@@ -153,6 +153,7 @@ class Formula():
         self.atoms = kwargs['atoms']
         self.literals = kwargs['literals']
         self.clauses = kwargs['clauses']
+        self.logic = kwargs['logic']
 
         self.simple_atmoms = {}
         letter = ord('A')

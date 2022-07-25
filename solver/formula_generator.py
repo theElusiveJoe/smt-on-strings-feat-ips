@@ -193,20 +193,21 @@ class Generator():
         )
         return f
 
-    def to_smt2_file(self, filepath=None, include_config=False):
+    def to_smt2_file(self, filepath=None, include_config=False, cvc5=False):
         """
         file_path is None => std.out 
         """
         s = ''.join([f'; CONFIG:  {key} : {self.config[key]}\n' for key in self.config]) + '\n' if include_config else ''
-        
+        s += '(set-logic QF_SLIA)\n'
+        if cvc5:
+            s += '(set-option :strings-exp true)\n'
         s += '\n'.join([f'(declare-fun {str(x)} () String)' for x in self.variables])
-        s+='\n\n'
+        s += '\n\n'
         s += '\n'.join([f'(assert {str(x)})' for x in self.clauses])
         
         if not filepath:
             print(s)
             return 
-
         try:
             with open(filepath, 'w+') as dst:
                 dst.write(s)
