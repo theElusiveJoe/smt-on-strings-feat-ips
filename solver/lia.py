@@ -22,10 +22,7 @@ class Lia_Formula():
     и получения интерпретации в рамках теории lia
     """
 
-    # почему мемоизация пишется без буквы "р"?...
-
-    def __init__(self, formula: Formula):
-        self.formula = formula
+    def __init__(self, formula=None, m=None):
 
         self.varnames_generator = generate_ints()
 
@@ -33,12 +30,26 @@ class Lia_Formula():
         self.string_to_lia = {}
         self.variables = []
 
-        for atom in self.formula.atoms:
-            if atom not in self.atom_to_lia:
-                self.atom_interpretation_in_lia(atom)
+        self.clause_strings = []
+
+        if formula is not None and m is not None or formula is None and m is None:
+            raise Exception('Некорректные параметры для создания Lia_Formula')
+        elif formula:
+            self.formula = formula
+            for clause in formula.clauses:
+                if all(map(lambda x: not x.negation, clause.literals)):
+                    clause_interpret = self.clause_interpretation_in_lia(clause)
+                    self.clause_strings.append(f'(assert {clause_interpret})')
+        else:
+            self.literals = list(filter(lambda x: not x.negation, m))
+            for literal in self.literals:
+                new_clause_str = self.literal_interpretation_in_lia(literal)
+                self.clause_strings.append(f'(assert {new_clause_str})')
 
     def __str__(self):
         s = '###LIA_FORMULA###\n'
+        s += 'VARIABLES:\n'
+        s+= ' '.join(self.variables) + '\n'
         s += 'FAKE STRINGS:\n    '
         s += ''.join([f'\n    {y} <- {x}' if 'str.re' in x.stype else '' for x,
                      y in self.string_to_lia.items()])
@@ -89,36 +100,25 @@ class Lia_Formula():
     def clause_interpretation_in_lia(self, clause: Clause):
         literals_interpretations = [self.literal_interpretation_in_lia(
             literal) for literal in clause.literals]
-        literals_interpretations = list(filter(None, literals_interpretations))
-        if not literals_interpretations:
-            return
-        t = f'(or {" ". join(literals_interpretations)})'
-        return f'{t}'
+
+        return f'(or {" ". join(literals_interpretations)})'
 
     def literal_interpretation_in_lia(self, literal: Literal):
-        if literal.negation:
-            return 
-            # return f'(not {self.atom_to_lia[literal.atom]})'
+        if literal.atom not in self.atom_to_lia:
+            self.atom_interpretation_in_lia(literal.atom)
+
         return self.atom_to_lia[literal.atom]
 
     def check_sat(self):
         smt2_strings = ['(set-logic QF_LIA)']
+
         for var_name in self.variables:
             smt2_strings.append(f'(declare-fun {var_name} () Int)')
             smt2_strings.append(f'(assert (>= {var_name} 0))')
-        # for x, y in self.string_to_lia.items():
-            # if x.stype == 'str.replace' or x.stype == 'str.replace_all':
-            # smt2_strings.append(f'(assert (= {y} {x}))')
-        # smt2_strings.append(';------------------')
 
-        for clause in self.formula.clauses:
-            clause_interpret = self.clause_interpretation_in_lia(clause)
-            if clause_interpret:
-                smt2_strings.append(
-                    f'(assert {clause_interpret})')
-        # smt2_strings.append(';------------------')
+        smt2_strings.extend(self.clause_strings)
+
         smt2_strings.append('(check-sat)')
-        # smt2_strings.append('(get-model)')
 
         temp = 'temp.smt2'
         try:

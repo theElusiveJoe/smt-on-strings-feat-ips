@@ -2,8 +2,8 @@ from .structures import *
 from .lia import Lia_Formula
 
 
-def call_lia(f):
-    return  Lia_Formula(f).check_sat()
+def call_lia(formula=None, m=None):
+    return Lia_Formula(formula=formula, m=m).check_sat()
 
 
 def call_theory(f, m):
@@ -66,9 +66,6 @@ def decide(m, f):
 
 
 def check_node(m, f, old_m, dot_strings=None):
-    """
-    не забыть, что нельзя гонять один и тот же объект списка по рекурсивным вызовам
-    """
     if dot_strings is not None:
         # ds = f'{get_m_state(old_m, f)}' if old_m is not None else '"start"' + f' -> {get_m_state(m, f)}'
         # dot_strings.append(ds)
@@ -99,8 +96,10 @@ def check_node(m, f, old_m, dot_strings=None):
     в данный момент lia вызывается на каждом ветвлении
     """
     # 3 теперь можно проверить полученную модель в lia
-    if not call_lia(f):
+    if not call_lia(m=m):
+        print('Противоречие в LIA')
         return False
+    print()
 
     # 4 проверяем, осталось ли чего неопределенного в m
     if len(m) == len(f.atoms):
@@ -117,4 +116,4 @@ def get_m_state(m, f):
 
 
 def check_sat(f, dot_strings=None):
-    return check_node([], f, None, dot_strings=dot_strings)
+    return call_lia(formula=f) and check_node([], f, None, dot_strings=dot_strings)
