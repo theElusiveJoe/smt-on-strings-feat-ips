@@ -97,6 +97,7 @@ def check_node(m, f, old_m, dot_strings=None):
     """
     # 3 теперь можно проверить полученную модель в lia
     if not call_lia(m=m):
+        dot_strings.append(f'{get_m_state(m, f)}-> "ошибка в LIA"')
         print('Противоречие в LIA')
         return False
     print()
@@ -116,4 +117,14 @@ def get_m_state(m, f):
 
 
 def check_sat(f, dot_strings=None):
-    return call_lia(formula=f) and check_node([], f, None, dot_strings=dot_strings)
+    if dot_strings is not None:
+        legend = ['subgraph clusterMain {', 
+        'graph [labelloc="b" labeljust="r" label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">']
+        legend.extend(['<TR><TD>' + str(atom) + '</TD><TD>' + simple_value + '</TD></TR>' for atom, simple_value in f.simple_atmoms.items()])
+        legend.append('</TABLE>>];')
+        dot_strings.extend(legend)
+    if not call_lia(formula=f, m=None):
+        print('Формула не прошла проверку в lia')
+        return False
+
+    return check_node([], f, None, dot_strings=dot_strings)

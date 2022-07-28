@@ -41,7 +41,7 @@ class Lia_Formula():
                     clause_interpret = self.clause_interpretation_in_lia(clause)
                     self.clause_strings.append(f'(assert {clause_interpret})')
         else:
-            self.literals = list(filter(lambda x: not x.negation, m))
+            self.literals = list(filter(lambda x: x.negation, m))
             for literal in self.literals:
                 new_clause_str = self.literal_interpretation_in_lia(literal)
                 self.clause_strings.append(f'(assert {new_clause_str})')
@@ -127,5 +127,8 @@ class Lia_Formula():
                     f.write(s+'\n')
         except:
             raise Exception('Ошибка при создании/открытии временного файла')
+
+        for s in smt2_strings:
+            print(s)
 
         return not 'unsat' in str(subprocess.check_output(['z3', '-smt2', temp]), encoding='utf-8')
