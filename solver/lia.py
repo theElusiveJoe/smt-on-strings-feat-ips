@@ -41,7 +41,7 @@ class Lia_Formula():
                     clause_interpret = self.clause_interpretation_in_lia(clause)
                     self.clause_strings.append(f'(assert {clause_interpret})')
         else:
-            self.literals = list(filter(lambda x: x.negation, m))
+            self.literals = list(map(lambda x: x.get_conjugate(), filter(lambda x: x.negation, m)))
             for literal in self.literals:
                 new_clause_str = self.literal_interpretation_in_lia(literal)
                 self.clause_strings.append(f'(assert {new_clause_str})')
