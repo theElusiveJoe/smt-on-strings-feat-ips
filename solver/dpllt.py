@@ -123,8 +123,8 @@ def check_sat(f, dot_strings=None):
         legend.extend(['<TR><TD>' + str(atom) + '</TD><TD>' + simple_value + '</TD></TR>' for atom, simple_value in f.simple_atmoms.items()])
         legend.append('</TABLE>>];')
         dot_strings.extend(legend)
-    if not call_lia(formula=f, m=None):
-        print('Формула не прошла проверку в lia')
-        return False
+    # if not call_lia(formula=f, m=None):
+    #     print('Формула не прошла проверку в lia')
+    #     return False
 
     return check_node([], f, None, dot_strings=dot_strings)
