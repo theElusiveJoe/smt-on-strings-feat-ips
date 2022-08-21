@@ -1,33 +1,47 @@
+from structures import *
+
+
+def simplify(my_string1, my_string2):
+    if len(my_string1.concats_strs) <= len(my_string2.concats_strs):
+        length = len(my_string1.concats_strs)
+    else:
+        length = len(my_string2.concats_strs)
+    for i in range(length):
+        if my_string1.concats_strs[i] != my_string2.concats_strs[i]:
+            continue
+        if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
+            my_string1.concats_strs.remove(my_string1.concats_strs[i])
+            my_string2.concats_strs.remove(my_string2.concats_strs[i])
+
+
+def reverse_arrays(my_string1, my_string2):
+    my_string1.concats_strs = my_string1.concats_strs[::-1]
+    my_string2.concats_strs = my_string2.concats_strs[::-1]
+
+
 def left_right_simplify(my_string1, my_string2):
-    if len(my_string1.concats_strs) <= len(my_string2.concats_strs):
-        length = len(my_string1.concats_strs)
-    else:
-        length = len(my_string2.concats_strs)
-    for i in range(length):
-        if my_string1.concats_strs[i] != my_string2.concats_strs[i]:
-            break
-        if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
-            my_string1.concats_strs.remove(my_string1.concats_strs[i])
-            my_string2.concats_strs.remove(my_string2.concats_strs[i])
-    my_string1.concats_strs = my_string1.concats_strs[::-1]
-    my_string2.concats_strs = my_string2.concats_strs[::-1]
-    if len(my_string1.concats_strs) <= len(my_string2.concats_strs):
-        length = len(my_string1.concats_strs)
-    else:
-        length = len(my_string2.concats_strs)
-    for i in range(length):
-        if my_string1.concats_strs[i] != my_string2.concats_strs[i]:
-            break
-        if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
-            my_string1.concats_strs.remove(my_string1.concats_strs[i])
-            my_string2.concats_strs.remove(my_string2.concats_strs[i])
-    my_string1.concats_strs = my_string1.concats_strs[::-1]
-    my_string2.concats_strs = my_string2.concats_strs[::-1]
+    simplify(my_string1, my_string2)
+    reverse_arrays(my_string1, my_string2)
+    simplify(my_string1, my_string2)
+    reverse_arrays(my_string1, my_string2)
+
+
+multiset_l = {}
+multiset_r = {}
+
+
+def find_splits(mystring_1):
+    if mystring_1.stype == 'const':
+        if 'const' not in multiset_l:
+            multiset_l['const'] = 0
+        multiset_l['const'] += 1
+    elif mystring_1.stype == 'variable':
+        if mystring_1.var_name not in multiset_l:
+            multiset_l[mystring_1.var_name] = 0
+        multiset_l[mystring_1.var_name] += 1
 
 
 def cutter_cycle(atom):
-    multiset_l = {}
-    multiset_r = {}
     returnset_l = []
     returnset_r = []
     returnset_counter = 0
@@ -41,24 +55,9 @@ def cutter_cycle(atom):
         length = len(atom.my_string1.concats_strs)
     for i in range(length):
         for mystring_1, mystring_2 in zip(atom.my_string1.concats_strs, atom.my_string2.concats_strs):
-            if mystring_1.stype == 'const':
-                if 'const' not in multiset_l:
-                    multiset_l['const'] = 0
-                multiset_l['const'] += 1
-            elif mystring_1.stype == 'variable':
-                if mystring_1.var_name not in multiset_l:
-                    multiset_l[mystring_1.var_name] = 0
-                multiset_l[mystring_1.var_name] += 1
-
-            if mystring_2.stype == 'const':
-                if 'const' not in multiset_r:
-                    multiset_r['const'] = 0
-                multiset_r['const'] += 1
-            elif mystring_2.stype == 'variable':
-                if mystring_2.var_name not in multiset_r:
-                    multiset_r[mystring_2.var_name] = 0
-                multiset_r[mystring_2.var_name] += 1
-
+            find_splits(mystring_1)
+            find_splits(mystring_2)
+            
             if multiset_l == multiset_r:
                 cut_len = sum(multiset_l.values())
                 for i in range(cut_len):
