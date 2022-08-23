@@ -1,4 +1,4 @@
-from structures import *
+# from structures import *
 
 
 def simplify(my_string1, my_string2):
@@ -7,11 +7,23 @@ def simplify(my_string1, my_string2):
     else:
         length = len(my_string2.concats_strs)
     for i in range(length):
-        if my_string1.concats_strs[i] != my_string2.concats_strs[i]:
-            continue
-        if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
-            my_string1.concats_strs.remove(my_string1.concats_strs[i])
-            my_string2.concats_strs.remove(my_string2.concats_strs[i])
+        if my_string1.concats_strs[i].stype != my_string2.concats_strs[i].stype:
+            break
+        if my_string1.concats_strs[i].stype == 'variable':
+            if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
+                my_string1.concats_strs.remove(my_string1.concats_strs[i])
+                my_string2.concats_strs.remove(my_string2.concats_strs[i])
+            else:
+                break
+        elif my_string1.concats_strs[i].stype == 'const':
+            if my_string1.concats_strs[i].cont == my_string2.concats_strs[i].cont[
+                                                  0:len(my_string1.concats_strs[i].cont)]:
+                my_string2.concats_strs[i].cont = my_string2.concats_strs[i].cont[len(my_string1.concats_strs[i].cont):]
+                my_string1.concats_strs.remove(my_string1.concats_strs[i])
+            elif my_string2.concats_strs[i].cont == my_string1.concats_strs[i].cont[
+                                                    0:len(my_string2.concats_strs[i].cont)]:
+                my_string1.concats_strs[i].cont = my_string1.concats_strs[i].cont[len(my_string2.concats_strs[i].cont):]
+                my_string2.concats_strs.remove(my_string2.concats_strs[i])
 
 
 def reverse_arrays(my_string1, my_string2):
@@ -57,7 +69,7 @@ def cutter_cycle(atom):
         for mystring_1, mystring_2 in zip(atom.my_string1.concats_strs, atom.my_string2.concats_strs):
             find_splits(mystring_1)
             find_splits(mystring_2)
-            
+
             if multiset_l == multiset_r:
                 cut_len = sum(multiset_l.values())
                 for i in range(cut_len):
@@ -66,6 +78,7 @@ def cutter_cycle(atom):
                 returnset_counter += 1
                 atom.my_string1.concats_strs = atom.my_string1.concats_strs[cut_len:]
                 atom.my_string2.concats_strs = atom.my_string2.concats_strs[cut_len:]
+                left_right_simplify(atom.my_string1, atom.my_string2)
                 break
 
     if not atom.my_string1.concats_strs and atom.my_string2.concats_strs:
