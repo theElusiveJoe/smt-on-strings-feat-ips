@@ -1,104 +1,108 @@
-# from structures import *
+from .structures import *
 
 
-def simplify(my_string1, my_string2):
-    if len(my_string1.concats_strs) <= len(my_string2.concats_strs):
-        length = len(my_string1.concats_strs)
-    else:
-        length = len(my_string2.concats_strs)
-    for i in range(length):
-        if my_string1.concats_strs[i].stype != my_string2.concats_strs[i].stype:
+def translate_literal(atom):
+    return_array_l = []
+    return_array_r = []
+    for mystr in atom.my_string1.concats_strs:
+        if mystr.stype == 'const':
+            for char in mystr.cont:
+                return_array_l.append(String_Theory_Representation('char', char))
+        elif mystr.stype == 'variable':
+            return_array_l.append(String_Theory_Representation('variable', mystr.var_name))
+
+    for mystr in atom.my_string2.concats_strs:
+        if mystr.stype == 'const':
+            for char in mystr.cont:
+                return_array_r.append(String_Theory_Representation('char', char))
+        elif mystr.stype == 'variable':
+            return_array_r.append(String_Theory_Representation('variable', mystr.var_name))
+    return return_array_l, return_array_r
+
+def translate_representation(repr_array):
+    ret = My_String('str.++', concats_strs=repr_array)
+    return ret
+
+def simplify(rep_l, rep_r):
+    for char_l, char_r in zip(rep_l, rep_r):
+        if char_l == char_r:
+            rep_l.remove(char_l)
+            rep_r.remove(char_r)
+        else:
             break
-        if my_string1.concats_strs[i].stype == 'variable':
-            if my_string1.concats_strs[i] == my_string2.concats_strs[i]:
-                my_string1.concats_strs.remove(my_string1.concats_strs[i])
-                my_string2.concats_strs.remove(my_string2.concats_strs[i])
-            else:
-                break
-        elif my_string1.concats_strs[i].stype == 'const':
-            if my_string1.concats_strs[i].cont == my_string2.concats_strs[i].cont[
-                                                  0:len(my_string1.concats_strs[i].cont)]:
-                my_string2.concats_strs[i].cont = my_string2.concats_strs[i].cont[len(my_string1.concats_strs[i].cont):]
-                my_string1.concats_strs.remove(my_string1.concats_strs[i])
-            elif my_string2.concats_strs[i].cont == my_string1.concats_strs[i].cont[
-                                                    0:len(my_string2.concats_strs[i].cont)]:
-                my_string1.concats_strs[i].cont = my_string1.concats_strs[i].cont[len(my_string2.concats_strs[i].cont):]
-                my_string2.concats_strs.remove(my_string2.concats_strs[i])
 
 
-def reverse_arrays(my_string1, my_string2):
-    my_string1.concats_strs = my_string1.concats_strs[::-1]
-    my_string2.concats_strs = my_string2.concats_strs[::-1]
+def reverse_arrays(arr1, arr2):
+    arr1 = arr1[::-1]
+    arr2 = arr2[::-1]
 
 
-def left_right_simplify(my_string1, my_string2):
-    simplify(my_string1, my_string2)
-    reverse_arrays(my_string1, my_string2)
-    simplify(my_string1, my_string2)
-    reverse_arrays(my_string1, my_string2)
+def left_right_simplify(rep_l, rep_r):
+    simplify(rep_l, rep_r)
+    reverse_arrays(rep_l, rep_r)
+    simplify(rep_l, rep_r)
+    reverse_arrays(rep_l, rep_r)
 
 
 multiset_l = {}
 multiset_r = {}
 
 
-def find_splits(mystring_1):
-    if mystring_1.stype == 'const':
+def find_splits(rep_char):
+    if rep_char.type == 'char':
         if 'const' not in multiset_l:
             multiset_l['const'] = 0
         multiset_l['const'] += 1
-    elif mystring_1.stype == 'variable':
-        if mystring_1.var_name not in multiset_l:
-            multiset_l[mystring_1.var_name] = 0
-        multiset_l[mystring_1.var_name] += 1
+    elif rep_char.type == 'variable':
+        if rep_char.content not in multiset_l:
+            multiset_l[rep_char.content] = 0
+        multiset_l[rep_char.content] += 1
 
 
-def cutter_cycle(atom):
+def cutter_cycle(representation_l, representation_r):
     returnset_l = []
     returnset_r = []
-    returnset_counter = 0
-    concat_arr_l = []
-    concat_arr_r = []
     final_returnset = []
-    left_right_simplify(atom.my_string1, atom.my_string2)
-    if len(atom.my_string1.concats_strs) <= len(atom.my_string2.concats_strs):
-        length = len(atom.my_string2.concats_strs)
+    left_right_simplify(representation_l, representation_r)
+    if len(representation_l) <= len(representation_r):
+        length = len(representation_l)
     else:
-        length = len(atom.my_string1.concats_strs)
+        length = len(representation_r)
     for i in range(length):
-        for mystring_1, mystring_2 in zip(atom.my_string1.concats_strs, atom.my_string2.concats_strs):
-            find_splits(mystring_1)
-            find_splits(mystring_2)
-
+        for char_l, char_r in zip(representation_l, representation_r):
+            find_splits(char_l)
+            find_splits(char_r)
             if multiset_l == multiset_r:
+                print("!!!!!!!!!!!!!!!!!!!!!!")
                 cut_len = sum(multiset_l.values())
-                for i in range(cut_len):
-                    returnset_l[returnset_counter][i] = mystring_1[i]
-                    returnset_l[returnset_counter][i] = mystring_2[i]
-                returnset_counter += 1
-                atom.my_string1.concats_strs = atom.my_string1.concats_strs[cut_len:]
-                atom.my_string2.concats_strs = atom.my_string2.concats_strs[cut_len:]
-                left_right_simplify(atom.my_string1, atom.my_string2)
+                returnset_l.append(representation_l[0:cut_len-1])
+                returnset_r.append(representation_r[0:cut_len-1])
+                representation_l = representation_l[cut_len:]
+                representation_r = representation_r[cut_len:]
+                left_right_simplify(representation_l, representation_r)
                 break
 
-    if not atom.my_string1.concats_strs and atom.my_string2.concats_strs:
-        returnset_r.append(atom.my_string2.concats_strs)
-    elif not atom.my_string2.concats_strs and atom.my_string1.concats_strs:
-        returnset_l.append(atom.my_string1.concats_strs)
-
-    for mystr_array1, mystr_array2 in zip(returnset_l, returnset_r):
-        concat_arr_l.append(My_String('str.++', concats_strs=mystr_array1))
-        concat_arr_r.append(My_String('str.++', concats_strs=mystr_array2))
-    for left, right in zip(concat_arr_l, concat_arr_r):
-        final_returnset = Atom('=', left, right)
+    if not representation_l and representation_r:
+        returnset_r.append(representation_r)
+    elif not representation_r and representation_l:
+        returnset_l.append(representation_l)
+    for arr in returnset_l:
+        arr = translate_representation(arr)
+    for arr in returnset_r:
+        arr = translate_representation(arr)
+    for mystr_l, mystr_r in zip(returnset_l, returnset_r):
+        final_returnset.append(Atom('=', mystr_l, mystr_r))
     return final_returnset
+
 
 
 def cut(formula):
     for literal in formula.literals:
         if literal.atom.ltype == '=' and literal.atom.my_string1.stype == 'str.++' and literal.atom.my_string2.stype == 'str.++':
             if literal.negation is True:
-                cut_atom = cutter_cycle(literal.atom)
+                repres_l, repres_r = translate_literal(literal.atom)
+                print("!!!!!!!!!!!!!!!!!!!!!!")
+                cut_atom = cutter_cycle(repres_l, repres_r)
                 for new_atom in cut_atom:
                     new_atom = Literal(new_atom, True)
                 formula.literals.remove(literal)
