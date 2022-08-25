@@ -73,7 +73,6 @@ def cutter_cycle(representation_l, representation_r):
             find_splits(char_l)
             find_splits(char_r)
             if multiset_l == multiset_r:
-                print("!!!!!!!!!!!!!!!!!!!!!!")
                 cut_len = sum(multiset_l.values())
                 returnset_l.append(representation_l[0:cut_len-1])
                 returnset_r.append(representation_r[0:cut_len-1])
@@ -101,7 +100,6 @@ def cut(formula):
         if literal.atom.ltype == '=' and literal.atom.my_string1.stype == 'str.++' and literal.atom.my_string2.stype == 'str.++':
             if literal.negation is True:
                 repres_l, repres_r = translate_literal(literal.atom)
-                print("!!!!!!!!!!!!!!!!!!!!!!")
                 cut_atom = cutter_cycle(repres_l, repres_r)
                 for new_atom in cut_atom:
                     new_atom = Literal(new_atom, True)
