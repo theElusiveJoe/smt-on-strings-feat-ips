@@ -19,12 +19,21 @@ def translate_literal(atom):
             return_array_r.append(String_Theory_Representation('variable', mystr.var_name))
     return return_array_l, return_array_r
 
+
 def translate_representation(repr_array):
-    ret = My_String('str.++', concats_strs=repr_array)
+    temp = []
+    for repr in repr_array:
+        if repr.type == 'char':
+            temp_mystring = My_String('const', cont=repr.content)
+            temp.append(temp_mystring)
+        elif repr.type == 'variable':
+            temp.append(My_String(stype='variable', var_name=repr.content))
+    ret = My_String('str.++', concats_strs=temp)
     return ret
 
+
 def simplify(rep_l, rep_r):
-    for char_l, char_r in zip(rep_l, rep_r):
+    for char_l, char_r in zip(rep_l[:], rep_r[:]):
         if char_l == char_r:
             rep_l.remove(char_l)
             rep_r.remove(char_r)
@@ -46,20 +55,25 @@ def left_right_simplify(rep_l, rep_r):
 
 multiset_l = {}
 multiset_r = {}
+multiset_l_helper = []
+multiset_r_helper = []
 
 
-def find_splits(rep_char):
+def find_splits(rep_char, multiset, multiset_helper):
     if rep_char.type == 'char':
-        if 'const' not in multiset_l:
-            multiset_l['const'] = 0
-        multiset_l['const'] += 1
+        if 'const' not in multiset:
+            multiset['const'] = 0
+        multiset['const'] += 1
+        multiset_helper.append(rep_char)
     elif rep_char.type == 'variable':
-        if rep_char.content not in multiset_l:
-            multiset_l[rep_char.content] = 0
-        multiset_l[rep_char.content] += 1
+        if rep_char.content not in multiset:
+            multiset[rep_char.content] = 0
+        multiset[rep_char.content] += 1
+        multiset_helper.append(rep_char)
 
 
 def cutter_cycle(representation_l, representation_r):
+    global multiset_l, multiset_r, multiset_l_helper, multiset_r_helper
     returnset_l = []
     returnset_r = []
     final_returnset = []
@@ -69,40 +83,48 @@ def cutter_cycle(representation_l, representation_r):
     else:
         length = len(representation_r)
     for i in range(length):
-        for char_l, char_r in zip(representation_l, representation_r):
-            find_splits(char_l)
-            find_splits(char_r)
+        for char_l, char_r in zip(representation_l[:], representation_r[:]):
+            find_splits(char_l, multiset_l, multiset_l_helper)
+            find_splits(char_r, multiset_r, multiset_r_helper)
             if multiset_l == multiset_r:
-                cut_len = sum(multiset_l.values())
-                returnset_l.append(representation_l[0:cut_len-1])
-                returnset_r.append(representation_r[0:cut_len-1])
-                representation_l = representation_l[cut_len:]
-                representation_r = representation_r[cut_len:]
-                left_right_simplify(representation_l, representation_r)
+                returnset_l.append(multiset_l_helper)
+                returnset_r.append(multiset_r_helper)
+                multiset_l = {}
+                multiset_r = {}
+                multiset_l_helper = []
+                multiset_r_helper = []
                 break
 
-    if not representation_l and representation_r:
-        returnset_r.append(representation_r)
-    elif not representation_r and representation_l:
-        returnset_l.append(representation_l)
-    for arr in returnset_l:
-        arr = translate_representation(arr)
-    for arr in returnset_r:
-        arr = translate_representation(arr)
+    if multiset_l_helper and multiset_r_helper:
+        returnset_l.append(multiset_l_helper)
+        returnset_r.append(multiset_r_helper)
+
+    for i in range(len(returnset_l)):
+        returnset_l[i] = translate_representation(returnset_l[i])
+    for i in range(len(returnset_r)):
+        returnset_r[i] = translate_representation(returnset_r[i])
     for mystr_l, mystr_r in zip(returnset_l, returnset_r):
         final_returnset.append(Atom('=', mystr_l, mystr_r))
     return final_returnset
 
 
-
 def cut(formula):
-    for literal in formula.literals:
+    for literal in formula.literals[:]:
         if literal.atom.ltype == '=' and literal.atom.my_string1.stype == 'str.++' and literal.atom.my_string2.stype == 'str.++':
             if literal.negation is True:
                 repres_l, repres_r = translate_literal(literal.atom)
                 cut_atom = cutter_cycle(repres_l, repres_r)
-                for new_atom in cut_atom:
-                    new_atom = Literal(new_atom, True)
+                for i in range(len(cut_atom)):
+                    cut_atom[i] = Literal(cut_atom[i], True)
                 formula.literals.remove(literal)
                 for new_literal in cut_atom:
                     formula.literals.append(new_literal)
+            elif literal.negation is False:
+                repres_l, repres_r = translate_literal(literal.atom)
+                cut_atom = cutter_cycle(repres_l, repres_r)
+                for i in range(len(cut_atom)):
+                    cut_atom[i] = Clause(Literal(cut_atom[i], False))
+                formula.literals.remove(literal)
+                for new_clause in cut_atom:
+                    formula.clauses.append(new_clause)
+
