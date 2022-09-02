@@ -78,22 +78,17 @@ def cutter_cycle(representation_l, representation_r):
     returnset_r = []
     final_returnset = []
     left_right_simplify(representation_l, representation_r)
-    if len(representation_l) <= len(representation_r):
-        length = len(representation_l)
-    else:
-        length = len(representation_r)
-    for i in range(length):
-        for char_l, char_r in zip(representation_l[:], representation_r[:]):
-            find_splits(char_l, multiset_l, multiset_l_helper)
-            find_splits(char_r, multiset_r, multiset_r_helper)
-            if multiset_l == multiset_r:
-                returnset_l.append(multiset_l_helper)
-                returnset_r.append(multiset_r_helper)
-                multiset_l = {}
-                multiset_r = {}
-                multiset_l_helper = []
-                multiset_r_helper = []
-                break
+
+    for char_l, char_r in zip(representation_l[:], representation_r[:]):
+        find_splits(char_l, multiset_l, multiset_l_helper)
+        find_splits(char_r, multiset_r, multiset_r_helper)
+        if multiset_l == multiset_r:
+            returnset_l.append(multiset_l_helper)
+            returnset_r.append(multiset_r_helper)
+            multiset_l = {}
+            multiset_r = {}
+            multiset_l_helper = []
+            multiset_r_helper = []
 
     if multiset_l_helper and multiset_r_helper:
         returnset_l.append(multiset_l_helper)
@@ -115,16 +110,27 @@ def cut(formula):
                 repres_l, repres_r = translate_literal(literal.atom)
                 cut_atom = cutter_cycle(repres_l, repres_r)
                 for i in range(len(cut_atom)):
+                    formula.atoms.append(cut_atom[i])
                     cut_atom[i] = Literal(cut_atom[i], True)
                 formula.literals.remove(literal)
+                formula.atoms.remove(literal.atom)
+                for clause in formula.clauses[:]:
+                    if literal in clause.literals:
+                        formula.clauses.remove(clause)
                 for new_literal in cut_atom:
                     formula.literals.append(new_literal)
+                formula.clauses.append(Clause(cut_atom))
             elif literal.negation is False:
                 repres_l, repres_r = translate_literal(literal.atom)
                 cut_atom = cutter_cycle(repres_l, repres_r)
                 for i in range(len(cut_atom)):
-                    cut_atom[i] = Clause(Literal(cut_atom[i], False))
+                    formula.atoms.append(cut_atom[i])
+                    temp_literal = Literal(cut_atom[i], False)
+                    formula.literals.append(temp_literal)
+                    cut_atom[i] = Clause(temp_literal)
                 formula.literals.remove(literal)
+                for clause in formula.clauses[:]:
+                    if literal in clause.literals:
+                        formula.clauses.remove(clause)
                 for new_clause in cut_atom:
                     formula.clauses.append(new_clause)
-
