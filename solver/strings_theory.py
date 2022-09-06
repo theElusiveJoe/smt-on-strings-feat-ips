@@ -90,6 +90,9 @@ def cutter_cycle(representation_l, representation_r):
             multiset_l_helper = []
             multiset_r_helper = []
 
+    if not returnset_l:
+        return final_returnset
+
     if multiset_l_helper and multiset_r_helper:
         returnset_l.append(multiset_l_helper)
         returnset_r.append(multiset_r_helper)
@@ -104,33 +107,44 @@ def cutter_cycle(representation_l, representation_r):
 
 
 def cut(formula):
-    for literal in formula.literals[:]:
-        if literal.atom.ltype == '=' and literal.atom.my_string1.stype == 'str.++' and literal.atom.my_string2.stype == 'str.++':
-            if literal.negation is True:
-                repres_l, repres_r = translate_literal(literal.atom)
-                cut_atom = cutter_cycle(repres_l, repres_r)
-                for i in range(len(cut_atom)):
-                    formula.atoms.append(cut_atom[i])
-                    cut_atom[i] = Literal(cut_atom[i], True)
-                formula.literals.remove(literal)
-                formula.atoms.remove(literal.atom)
-                for clause in formula.clauses[:]:
-                    if literal in clause.literals:
-                        formula.clauses.remove(clause)
-                for new_literal in cut_atom:
-                    formula.literals.append(new_literal)
-                formula.clauses.append(Clause(cut_atom))
-            elif literal.negation is False:
-                repres_l, repres_r = translate_literal(literal.atom)
-                cut_atom = cutter_cycle(repres_l, repres_r)
-                for i in range(len(cut_atom)):
-                    formula.atoms.append(cut_atom[i])
-                    temp_literal = Literal(cut_atom[i], False)
-                    formula.literals.append(temp_literal)
-                    cut_atom[i] = Clause(temp_literal)
-                formula.literals.remove(literal)
-                for clause in formula.clauses[:]:
-                    if literal in clause.literals:
-                        formula.clauses.remove(clause)
-                for new_clause in cut_atom:
-                    formula.clauses.append(new_clause)
+    for clause in formula.clauses[:]:
+        for literal in clause.literals:
+            if literal.atom.ltype == '=' and literal.atom.my_string1.stype == 'str.++' and literal.atom.my_string2.stype == 'str.++':
+                if literal.negation is True:
+                    repres_l, repres_r = translate_literal(literal.atom)
+                    cut_atom = cutter_cycle(repres_l, repres_r)
+                    if not cut_atom:
+                        continue
+                    clause.literals.remove(literal)
+                    formula.literals.remove(literal)
+                    formula.atoms.remove(literal.atom)
+                    formula.strings.remove(literal.atom.my_string1)
+                    formula.strings.remove(literal.atom.my_string2)
+                    for i in range(len(cut_atom)):
+                        formula.strings.append(cut_atom[i].my_string1)
+                        formula.strings.append(cut_atom[i].my_string2)
+                        formula.atoms.append(cut_atom[i])
+                        cut_atom[i] = Literal(cut_atom[i], True)
+                        formula.literals.append(cut_atom[i])
+                        clause.literals.append(cut_atom[i])
+                    for new_literal in cut_atom:
+                        formula.literals.append(new_literal)
+                elif literal.negation is False:
+                    repres_l, repres_r = translate_literal(literal.atom)
+                    cut_atom = cutter_cycle(repres_l, repres_r)
+                    if not cut_atom:
+                        continue
+                    formula.clauses.remove(clause)
+                    formula.literals.remove(literal)
+                    formula.atoms.remove(literal.atom)
+                    formula.strings.remove(literal.atom.my_string1)
+                    formula.strings.remove(literal.atom.my_string2)
+                    temp = []
+                    for i in range(len(cut_atom)):
+                        temp.append(Literal(cut_atom[i], False))
+                        formula.clauses.append(Clause(temp))
+                        temp.clear()
+                        formula.literals.append(Literal(cut_atom[i], False))
+                        formula.atoms.append(cut_atom[i])
+                        formula.strings.append(cut_atom[i].my_string1)
+                        formula.strings.append(cut_atom[i].my_string2)
