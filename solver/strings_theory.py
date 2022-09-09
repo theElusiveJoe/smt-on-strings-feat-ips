@@ -1,5 +1,5 @@
 from .structures import *
-
+import collections
 
 def translate_literal(atom):
     return_array_l = []
@@ -57,6 +57,8 @@ multiset_l = {}
 multiset_r = {}
 multiset_l_helper = []
 multiset_r_helper = []
+multiset_l_helper_2 = []
+multiset_r_helper_2 = []
 
 
 def find_splits(rep_char, multiset, multiset_helper):
@@ -90,9 +92,6 @@ def cutter_cycle(representation_l, representation_r):
             multiset_l_helper = []
             multiset_r_helper = []
 
-    if not returnset_l:
-        return final_returnset
-
     if multiset_l_helper and multiset_r_helper:
         returnset_l.append(multiset_l_helper)
         returnset_r.append(multiset_r_helper)
@@ -103,6 +102,10 @@ def cutter_cycle(representation_l, representation_r):
         returnset_r[i] = translate_representation(returnset_r[i])
     for mystr_l, mystr_r in zip(returnset_l, returnset_r):
         final_returnset.append(Atom('=', mystr_l, mystr_r))
+    multiset_l = {}
+    multiset_r = {}
+    multiset_l_helper = []
+    multiset_r_helper = []
     return final_returnset
 
 
@@ -113,8 +116,16 @@ def cut(formula):
                 if literal.negation is True:
                     repres_l, repres_r = translate_literal(literal.atom)
                     cut_atom = cutter_cycle(repres_l, repres_r)
-                    if not cut_atom:
-                        continue
+                    cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
+                    if len(cut_atom) == 1 and len(cut_atom_2) != 1:
+                        cut_atom = cut_atom_2
+                    elif len(cut_atom) != 1 and len(cut_atom_2) != 1:
+                        for atom_1 in cut_atom[:]:
+                            for atom_2 in cut_atom_2[:]:
+                                if atom_1 == atom_2:
+                                    cut_atom.remove(atom_1)
+                                    cut_atom_2.remove(atom_2)
+                        cut_atom.extend(cut_atom_2)
                     clause.literals.remove(literal)
                     formula.literals.remove(literal)
                     formula.atoms.remove(literal.atom)
@@ -132,8 +143,16 @@ def cut(formula):
                 elif literal.negation is False:
                     repres_l, repres_r = translate_literal(literal.atom)
                     cut_atom = cutter_cycle(repres_l, repres_r)
-                    if not cut_atom:
-                        continue
+                    cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
+                    if len(cut_atom) == 1 and len(cut_atom_2) != 1:
+                        cut_atom = cut_atom_2
+                    elif len(cut_atom) != 1 and len(cut_atom_2) != 1:
+                        for atom_1 in cut_atom[:]:
+                            for atom_2 in cut_atom_2[:]:
+                                if atom_1 == atom_2:
+                                    cut_atom.remove(atom_1)
+                                    cut_atom_2.remove(atom_2)
+                        cut_atom.extend(cut_atom_2)
                     formula.clauses.remove(clause)
                     formula.literals.remove(literal)
                     formula.atoms.remove(literal.atom)
