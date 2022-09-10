@@ -153,17 +153,17 @@ def cut(formula):
                                     cut_atom.remove(atom_1)
                                     cut_atom_2.remove(atom_2)
                         cut_atom.extend(cut_atom_2)
-                    formula.clauses.remove(clause)
                     formula.literals.remove(literal)
+                    clause.literals.remove(literal)
                     formula.atoms.remove(literal.atom)
                     formula.strings.remove(literal.atom.my_string1)
                     formula.strings.remove(literal.atom.my_string2)
                     temp = []
                     for i in range(len(cut_atom)):
-                        temp.append(Literal(cut_atom[i], False))
-                        formula.clauses.append(Clause(temp))
-                        temp.clear()
-                        formula.literals.append(Literal(cut_atom[i], False))
-                        formula.atoms.append(cut_atom[i])
                         formula.strings.append(cut_atom[i].my_string1)
                         formula.strings.append(cut_atom[i].my_string2)
+                        formula.atoms.append(cut_atom[i])
+                        formula.literals.append(Literal(cut_atom[i], False))
+                        temp.append(Literal(cut_atom[i], False))
+                        formula.clauses.append(Clause(temp))
+                        temp = []
