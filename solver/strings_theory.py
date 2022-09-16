@@ -163,6 +163,8 @@ def cut(formula):
                     repres_l, repres_r = translate_literal(literal.atom)
                     cut_atom = cutter_cycle(repres_l, repres_r)
                     cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
+                    for a in cut_atom: print(a)
+                    for a in cut_atom_2: print(a)
                     if len(cut_atom) == 1 and len(cut_atom_2) != 1:
                         for atom in cut_atom_2[:]:
                             atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
@@ -179,6 +181,10 @@ def cut(formula):
                             atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
                         temp_atom = cut_atom[-1]
                         cut_atom.extend(cut_atom_2)
+                    elif len(cut_atom) == 1 and len(cut_atom_2) == 1 and (len(cut_atom[0].my_string1.concats_strs) + len(cut_atom[0].my_string2.concats_strs)) > (len(cut_atom_2[0].my_string1.concats_strs) + len(cut_atom_2[0].my_string2.concats_strs)):
+                        cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
+                        cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
+                        cut_atom = cut_atom_2
                     #print(temp_atom)
                     if temp_atom:
                         cut_atom.remove(temp_atom)
