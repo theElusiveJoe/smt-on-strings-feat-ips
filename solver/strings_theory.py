@@ -80,11 +80,7 @@ def cutter_cycle(representation_l, representation_r):
     returnset_r = []
     final_returnset = []
     length = 0
-    print(representation_l)
-    print(representation_r)
     left_right_simplify(representation_l, representation_r)
-    print(representation_l)
-    print(representation_r)
     for char_l, char_r in zip(representation_l[:], representation_r[:]):
         find_splits(char_l, multiset_l, multiset_l_helper)
         find_splits(char_r, multiset_r, multiset_r_helper)
@@ -159,35 +155,34 @@ def cut(formula):
                     for new_literal in cut_atom:
                         formula.literals.append(new_literal)
                 elif literal.negation is False:
-                    temp_atom = 0
                     repres_l, repres_r = translate_literal(literal.atom)
                     cut_atom = cutter_cycle(repres_l, repres_r)
-                    cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
-                    for a in cut_atom: print(a)
-                    for a in cut_atom_2: print(a)
-                    if len(cut_atom) == 1 and len(cut_atom_2) != 1:
-                        for atom in cut_atom_2[:]:
+                    # for a in cut_atom: print(a)
+                    if len(cut_atom) == 1:
+                        cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
+                        if len(cut_atom_2) == 1:
+                            len_sum1 = len(cut_atom[0].my_string1.concats_strs) + len(cut_atom[0].my_string2.concats_strs)
+                            len_sum2 = len(cut_atom_2[0].my_string1.concats_strs) + len(cut_atom_2[0].my_string2.concats_strs)
+                            if len_sum1 > len_sum2:
+                                cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
+                                cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
+                                cut_atom = cut_atom_2
+                        elif len(cut_atom_2) > 1:
+                            for atom in cut_atom_2:
+                                atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
+                                atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
+                            cut_atom = cut_atom_2
+                    elif len(cut_atom) > 1:
+                        temp = cut_atom[-1]
+                        temp.my_string1.concats_strs = temp.my_string1.concats_strs[::-1]
+                        temp.my_string2.concats_strs = temp.my_string2.concats_strs[::-1]
+                        repres_l, repres_r = translate_literal(temp)
+                        cut_atom_2 = cutter_cycle(repres_l, repres_r)
+                        for atom in cut_atom_2:
                             atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
                             atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
-                        cut_atom = cut_atom_2
-                    elif len(cut_atom) != 1 and len(cut_atom_2) != 1:
-                        for atom_1 in cut_atom[:]:
-                            for atom_2 in cut_atom_2[:]:
-                                if atom_1 == atom_2:
-                                    cut_atom.remove(atom_1)
-                                    cut_atom_2.remove(atom_2)
-                        for atom in cut_atom_2[:]:
-                            atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
-                            atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
-                        temp_atom = cut_atom[-1]
+                        cut_atom.remove(temp)
                         cut_atom.extend(cut_atom_2)
-                    elif len(cut_atom) == 1 and len(cut_atom_2) == 1 and (len(cut_atom[0].my_string1.concats_strs) + len(cut_atom[0].my_string2.concats_strs)) > (len(cut_atom_2[0].my_string1.concats_strs) + len(cut_atom_2[0].my_string2.concats_strs)):
-                        cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
-                        cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
-                        cut_atom = cut_atom_2
-                    #print(temp_atom)
-                    if temp_atom:
-                        cut_atom.remove(temp_atom)
                     formula.literals.remove(literal)
                     clause.literals.remove(literal)
                     formula.atoms.remove(literal.atom)
