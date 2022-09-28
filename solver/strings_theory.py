@@ -1,35 +1,54 @@
 from .structures import *
-import collections
 
 
 def translate_literal(atom):
     return_array_l = []
     return_array_r = []
-    for mystr in atom.my_string1.concats_strs:
-        if mystr.stype == 'const':
-            for char in mystr.cont:
+    if atom.my_string1.concats_strs:
+        for mystr in atom.my_string1.concats_strs:
+            if mystr.stype == 'const':
+                for char in mystr.cont:
+                    return_array_l.append(String_Theory_Representation('char', char))
+            elif mystr.stype == 'variable':
+                return_array_l.append(String_Theory_Representation('variable', mystr.var_name))
+    else:
+        if atom.my_string1.stype == 'const':
+            for char in atom.my_string1.cont:
                 return_array_l.append(String_Theory_Representation('char', char))
-        elif mystr.stype == 'variable':
-            return_array_l.append(String_Theory_Representation('variable', mystr.var_name))
+        elif atom.my_string1.stype == 'variable':
+            return_array_l.append(String_Theory_Representation('variable', atom.my_string1.var_name))
 
-    for mystr in atom.my_string2.concats_strs:
-        if mystr.stype == 'const':
-            for char in mystr.cont:
+    if atom.my_string2.concats_strs:
+        for mystr in atom.my_string2.concats_strs:
+            if mystr.stype == 'const':
+                for char in mystr.cont:
+                    return_array_r.append(String_Theory_Representation('char', char))
+            elif mystr.stype == 'variable':
+                return_array_r.append(String_Theory_Representation('variable', mystr.var_name))
+    else:
+        if atom.my_string2.stype == 'const':
+            for char in atom.my_string2.cont:
                 return_array_r.append(String_Theory_Representation('char', char))
-        elif mystr.stype == 'variable':
-            return_array_r.append(String_Theory_Representation('variable', mystr.var_name))
+        elif atom.my_string2.stype == 'variable':
+            return_array_r.append(String_Theory_Representation('variable', atom.my_string2.var_name))
     return return_array_l, return_array_r
 
 
 def translate_representation(repr_array):
     temp = []
-    for repr in repr_array:
-        if repr.type == 'char':
-            temp_mystring = My_String('const', cont=repr.content)
-            temp.append(temp_mystring)
-        elif repr.type == 'variable':
-            temp.append(My_String(stype='variable', var_name=repr.content))
-    ret = My_String('str.++', concats_strs=temp)
+    if len(repr_array) > 1:
+        for repr in repr_array:
+            if repr.type == 'char':
+                temp_mystring = My_String('const', cont=repr.content)
+                temp.append(temp_mystring)
+            elif repr.type == 'variable':
+                temp.append(My_String(stype='variable', var_name=repr.content))
+        ret = My_String('str.++', concats_strs=temp)
+    elif len(repr_array) == 1:
+        if repr_array[0].type == 'char':
+            ret = My_String('const', cont=repr_array[0].content)
+        elif repr_array[0].type == 'variable':
+            ret = My_String('variable', var_name=repr_array[0].content)
     return ret
 
 
@@ -92,11 +111,24 @@ def cutter_cycle(representation_l, representation_r):
             multiset_r = {}
             multiset_l_helper = []
             multiset_r_helper = []
-    if multiset_l_helper and multiset_r_helper:
+    if multiset_l_helper or multiset_r_helper:
         for arr in returnset_l:
             length += len(arr)
         returnset_l.append(representation_l[length:])
         returnset_r.append(representation_r[length:])
+    elif len(representation_l) != len(representation_r):
+        len_l = 0
+        len_r = 0
+        for arr in returnset_l:
+            len_l += len(arr)
+        for arr in returnset_r:
+            len_r += len(arr)
+        if len(representation_l) > len(representation_r):
+            returnset_l.append(representation_l[len_l:])
+            returnset_r.append([String_Theory_Representation('char', "")])
+        else:
+            returnset_r.append(representation_r[len_r:])
+            returnset_l.append([String_Theory_Representation('char', "")])
     for arr_l, arr_r in zip(returnset_l[:], returnset_r[:]):
         if len(arr_l) == 1 and len(arr_r) == 1 and arr_l == arr_r:
             returnset_l.remove(arr_l)
@@ -184,13 +216,16 @@ def cut(formula):
                                 cut_atom = cut_atom_2
                         elif len(cut_atom_2) > 1:
                             for atom in cut_atom_2:
-                                atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
-                                atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
+                                if atom.my_string1.concats_strs and atom.my_string2.concats_strs:
+                                    atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
+                                    atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
                             cut_atom = cut_atom_2
                     elif len(cut_atom) > 1:
                         temp = cut_atom[-1]
-                        temp.my_string1.concats_strs = temp.my_string1.concats_strs[::-1]
-                        temp.my_string2.concats_strs = temp.my_string2.concats_strs[::-1]
+                        if temp.my_string1.concats_strs:
+                            temp.my_string1.concats_strs = temp.my_string1.concats_strs[::-1]
+                        if temp.my_string2.concats_strs:
+                            temp.my_string2.concats_strs = temp.my_string2.concats_strs[::-1]
                         repres_l, repres_r = translate_literal(temp)
                         cut_atom_2 = cutter_cycle(repres_l, repres_r)
                         for atom in cut_atom_2:
