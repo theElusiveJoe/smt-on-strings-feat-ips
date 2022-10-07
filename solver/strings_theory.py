@@ -173,8 +173,10 @@ def cut(formula):
                             cut_atom = cut_atom_2
                     elif len(cut_atom) > 1:
                         temp = cut_atom[-1]
-                        temp.my_string1.concats_strs = temp.my_string1.concats_strs[::-1]
-                        temp.my_string2.concats_strs = temp.my_string2.concats_strs[::-1]
+                        if temp.my_string1.concats_strs:
+                            temp.my_string1.concats_strs = temp.my_string1.concats_strs[::-1]
+                        if temp.my_string2.concats_strs:
+                            temp.my_string2.concats_strs = temp.my_string2.concats_strs[::-1]
                         repres_l, repres_r = translate_literal(temp)
                         cut_atom_2 = cutter_cycle(repres_l, repres_r)
                         for atom in cut_atom_2:
