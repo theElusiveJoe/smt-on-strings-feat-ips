@@ -153,15 +153,30 @@ def cut(formula):
                 if literal.negation is True:
                     repres_l, repres_r = translate_literal(literal.atom)
                     cut_atom = cutter_cycle(repres_l, repres_r)
-
                     if len(cut_atom) == 1:
                         repres_l, repres_r = translate_literal(cut_atom[0])
                         cut_atom_2 = cutter_cycle(repres_l[::-1], repres_r[::-1])
                         if len(cut_atom_2) == 1:
-                            len_sum1 = len(cut_atom[0].my_string1.concats_strs) + len(
-                                cut_atom[0].my_string2.concats_strs)
-                            len_sum2 = len(cut_atom_2[0].my_string1.concats_strs) + len(
-                                cut_atom_2[0].my_string2.concats_strs)
+                            if not cut_atom[0].my_string1.concats_strs and not cut_atom[0].my_string2.concats_strs:
+                                len_sum1 = 2
+                            elif not cut_atom[0].my_string1.concats_strs and cut_atom[0].my_string2.concats_strs:
+                                len_sum1 = 1 + len(cut_atom[0].my_string2.concats_strs)
+                            elif cut_atom[0].my_string1.concats_strs and not cut_atom[0].my_string2.concats_strs:
+                                len_sum1 = 1 + len(cut_atom[0].my_string1.concats_strs)
+                            elif cut_atom[0].my_string1.concats_strs and cut_atom[0].my_string2.concats_strs:
+                                len_sum1 = len(cut_atom[0].my_string1.concats_strs) + len(
+                                    cut_atom[0].my_string2.concats_strs)
+
+                            if not cut_atom_2[0].my_string1.concats_strs and not cut_atom_2[0].my_string2.concats_strs:
+                                len_sum2 = 2
+                            elif not cut_atom_2[0].my_string1.concats_strs and cut_atom_2[0].my_string2.concats_strs:
+                                len_sum2 = 1 + len(cut_atom_2[0].my_string2.concats_strs)
+                            elif cut_atom_2[0].my_string1.concats_strs and not cut_atom_2[0].my_string2.concats_strs:
+                                len_sum2 = 1 + len(cut_atom_2[0].my_string1.concats_strs)
+                            elif cut_atom_2[0].my_string1.concats_strs and cut_atom_2[0].my_string2.concats_strs:
+                                len_sum2 = len(cut_atom_2[0].my_string1.concats_strs) + len(
+                                    cut_atom_2[0].my_string2.concats_strs)
+
                             if len_sum1 > len_sum2:
                                 cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
                                 cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
