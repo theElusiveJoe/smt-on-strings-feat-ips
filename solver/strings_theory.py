@@ -178,13 +178,17 @@ def cut(formula):
                                     cut_atom_2[0].my_string2.concats_strs)
 
                             if len_sum1 > len_sum2:
-                                cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
-                                cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
+                                if cut_atom_2[0].my_string1.concats_strs:
+                                    cut_atom_2[0].my_string1.concats_strs = cut_atom_2[0].my_string1.concats_strs[::-1]
+                                if cut_atom_2[0].my_string2.concats_strs:
+                                    cut_atom_2[0].my_string2.concats_strs = cut_atom_2[0].my_string2.concats_strs[::-1]
                                 cut_atom = cut_atom_2
                         elif len(cut_atom_2) > 1:
                             for atom in cut_atom_2:
-                                atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
-                                atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
+                                if atom.my_string1.concats_strs:
+                                    atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
+                                if atom.my_string2.concats_strs:
+                                    atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
                             cut_atom = cut_atom_2
                     elif len(cut_atom) > 1:
                         temp = cut_atom[-1]
@@ -195,8 +199,9 @@ def cut(formula):
                         repres_l, repres_r = translate_literal(temp)
                         cut_atom_2 = cutter_cycle(repres_l, repres_r)
                         for atom in cut_atom_2:
-                            if atom.my_string1.concats_strs and atom.my_string2.concats_strs:
+                            if atom.my_string1.concats_strs:
                                 atom.my_string1.concats_strs = atom.my_string1.concats_strs[::-1]
+                            if atom.my_string2.concats_strs:
                                 atom.my_string2.concats_strs = atom.my_string2.concats_strs[::-1]
                         cut_atom.remove(temp)
                         cut_atom.extend(cut_atom_2)
