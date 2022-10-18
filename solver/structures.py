@@ -1,6 +1,7 @@
 from copy import deepcopy
 import random
 
+
 class My_String():
     """
     stype - один из:
@@ -12,19 +13,20 @@ class My_String():
             raise Exception(
                 f'Указан неверный stype при создании My_String: {stype}')
         if 'str.rep' in stype and (len(replace_strs) != 3 or replace_strs[1].cont == ''):
-            raise Exception(f'Ошибка при создании my_string: stype={stype}, replace_strs={[str(rs) for rs in replace_strs]}')
+            raise Exception(
+                f'Ошибка при создании my_string: stype={stype}, replace_strs={[str(rs) for rs in replace_strs]}')
 
         if concats_strs:
             concats_strs = list(
                 filter(lambda x: x is not None and x.cont != '', concats_strs))
             if len(concats_strs) == 1:
-                    the_only_str= concats_strs[0]
-                    self.stype = the_only_str.stype
-                    self.cont = the_only_str.cont
-                    self.var_name = the_only_str.var_name
-                    self.concats_strs = the_only_str.concats_strs
-                    self.replace_strs = the_only_str.replace_strs
-                    return
+                the_only_str = concats_strs[0]
+                self.stype = the_only_str.stype
+                self.cont = the_only_str.cont
+                self.var_name = the_only_str.var_name
+                self.concats_strs = the_only_str.concats_strs
+                self.replace_strs = the_only_str.replace_strs
+                return
         self.stype = stype
         self.cont = cont
         self.var_name = var_name
@@ -166,16 +168,16 @@ class Formula():
             s = '\n###FORMULA:###\n'
             s += 'STRINGS:\n'
             for x in self.strings:
-                s += '  ' + str(x)+'\n'
+                s += '  ' + str(x) + '\n'
             s += 'ATOMS:\n'
             for x in self.atoms:
-                s += '  ' + str(x)+'\n'
+                s += '  ' + str(x) + '\n'
             s += 'LITERALS:\n'
             for x in self.literals:
-                s += '  ' + str(x)+'\n'
+                s += '  ' + str(x) + '\n'
             s += 'CLAUSES:\n'
             for x in self.clauses:
-                s += '  ' + str(x)+'\n'
+                s += '  ' + str(x) + '\n'
             return s
         except:
             return "ПУСТАЯ ФОРМУЛА"
@@ -202,3 +204,31 @@ class Formula():
         for clause in self.clauses:
             # print(f'(or {" ".join([self.dpll_literal_view(literal) for literal in clause.literals])})')
             print(self.dpll_clause_view(clause))
+
+
+class String_Theory_Representation():
+    """
+    type - один из:
+    'char', 'variable'
+    """
+
+    def __init__(self, type, content):
+        if type not in ['char', 'variable']:
+            raise Exception(f'Указан неверный stype при создании String_Theory_Representation: {type}')
+        self.type = type
+        self.content = content
+
+    def __str__(self):
+        if self.type == 'char':
+            return f'(char "{self.content}")'
+        else:
+            return f'(variable {self.content})'
+
+    def __repr__(self):
+        return self.__str__()
+
+    def __eq__(self, o):
+        return self.type == o.type and self.content == o.content
+
+    def __hash__(self):
+        return len(self.__str__())
